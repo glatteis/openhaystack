@@ -78,18 +78,40 @@
         (NSString *)kSecReturnAttributes : @true
     };
 
-    CFTypeRef item;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &item);
+    CFTypeRef items;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &items);
 
     if (status == errSecSuccess) {
+<<<<<<< Updated upstream
         NSDictionary *itemDict = (__bridge NSDictionary *)(item);
 
         NSString *accountId = itemDict[(NSString *)kSecAttrAccount];
+=======
+      NSArray<NSDictionary *> *itemsArray = (__bridge NSArray<NSDictionary *> *)(items);
 
-        return accountId;
+      NSDictionary __block *itemDict;
+      if ([itemsArray count] > 1) {
+        NSLog(@"Multiple items!");
+
+        [itemsArray enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+          NSString *email = obj[(NSString *)kSecAttrLabel];
+          NSLog(@"%@", email);
+          if ([email hasPrefix:@"tomas@h"]) {
+            itemDict = obj;
+          }
+        }];
+      } else {
+        itemDict = itemsArray[0];
+      }
+
+      NSString *accountId = itemDict[(NSString *)kSecAttrAccount];
+>>>>>>> Stashed changes
+
+      return accountId;
     }
 
     return nil;
+
 }
 
 - (NSString *)basicAuthForAppleID:(NSString *)appleId andToken:(NSData *)token {

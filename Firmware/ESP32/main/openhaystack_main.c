@@ -154,6 +154,10 @@ void app_main(void)
         ESP_LOGE(LOG_TAG, "couldn't set random address: %s", esp_err_to_name(status));
         return;
     }
+    if ((status = esp_ble_gap_set_device_name("Shitty Velocity")) != ESP_OK) {
+        ESP_LOGE(LOG_TAG, "couldn't set device name: %s", esp_err_to_name(status));
+        return;
+    }
     if ((esp_ble_gap_config_adv_data_raw((uint8_t*)&adv_data, sizeof(adv_data))) != ESP_OK) {
         ESP_LOGE(LOG_TAG, "couldn't configure BLE adv: %s", esp_err_to_name(status));
         return;
