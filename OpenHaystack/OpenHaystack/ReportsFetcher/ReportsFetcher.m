@@ -12,11 +12,7 @@
 
 #import <Accounts/Accounts.h>
 
-#ifdef SERVER
-#import "OpenHaystackServer-Swift.h"
-#else
 #import "OpenHaystack-Swift.h"
-#endif
 
 @implementation ReportsFetcher
 
@@ -30,10 +26,12 @@
 
     CFTypeRef item;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &item);
-
+    
+    
     if (status == errSecSuccess) {
         NSData *securityToken = (__bridge NSData *)(item);
-
+        CFRelease(item);
+        
         NSLog(@"Fetched token %@", [[NSString alloc] initWithData:securityToken encoding:NSUTF8StringEncoding]);
 
         if (securityToken.length == 0) {
@@ -78,40 +76,19 @@
         (NSString *)kSecReturnAttributes : @true
     };
 
-    CFTypeRef items;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &items);
+    CFTypeRef item;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &item);
 
     if (status == errSecSuccess) {
-<<<<<<< Updated upstream
         NSDictionary *itemDict = (__bridge NSDictionary *)(item);
-
+        CFRelease(item);
+        
         NSString *accountId = itemDict[(NSString *)kSecAttrAccount];
-=======
-      NSArray<NSDictionary *> *itemsArray = (__bridge NSArray<NSDictionary *> *)(items);
 
-      NSDictionary __block *itemDict;
-      if ([itemsArray count] > 1) {
-        NSLog(@"Multiple items!");
-
-        [itemsArray enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-          NSString *email = obj[(NSString *)kSecAttrLabel];
-          NSLog(@"%@", email);
-          if ([email hasPrefix:@"tomas@h"]) {
-            itemDict = obj;
-          }
-        }];
-      } else {
-        itemDict = itemsArray[0];
-      }
-
-      NSString *accountId = itemDict[(NSString *)kSecAttrAccount];
->>>>>>> Stashed changes
-
-      return accountId;
+        return accountId;
     }
 
     return nil;
-
 }
 
 - (NSString *)basicAuthForAppleID:(NSString *)appleId andToken:(NSData *)token {
